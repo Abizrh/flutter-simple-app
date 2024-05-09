@@ -10,100 +10,73 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Todo App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: TodoList(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+class TodoList extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  createState() => new TodoListState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class TodoListState extends State<TodoList> {
+  List<String> _todoItems = [];
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+  void _addTodos(String task) {
+    if (task.length > 0) {
+      setState(() {
+        _todoItems.add(task);
+      });
+    }
+  }
+
+  void _pushTodoScreen() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Add new todo')),
+        body: TextField(
+            autofocus: true,
+            onSubmitted: (val) {
+              _addTodos(val);
+              Navigator.pop(context);
+            }),
+      );
+    }));
+  }
+
+  Widget _buildTodoList() {
+    return ListView.builder(itemBuilder: (ctx, idx) {
+      if (idx < _todoItems.length) {
+        return _buildTodoItem(_todoItems[idx]);
+      }
     });
+  }
+
+  Widget _buildTodoItem(String todo) {
+    return ListTile(
+      title: Text(todo),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    /*
-    * Today learn: Layout Widgets
-    */
-
-    // const ic = Icon(
-    //   Icons.center_focus_strong,
-    //   color: Colors.red,
-    //   size: 100.0,
-    // );
-
-    /*
-    * position widget
-    */
-
-    // const center = Center(child: ic);
-    // const align = Align(
-    //   alignment: Alignment.bottomCenter,
-    //   child: ic,
-    // );
-    const double size = 40.0;
-
-    const icon1 = Icon(Icons.looks_one, color: Colors.red, size: size);
-    // const icon2 = Icon(Icons.looks_two, color: Colors.red, size: size);
-    // const icon3 = Icon(Icons.looks_3, color: Colors.red, size: size);
-
-    /*
-    * row widget
-    */
-    // const myRowContect = Row(
-    //   mainAxisAlignment: MainAxisAlignment.center,
-    //   // crossAxisAlignment: CrossAxisAlignment.stretch,
-    //   children: [icon1, icon2, icon3],
-    // );
-
-    /*
-    * column widget
-    */
-
-    // const myColContect = Column(
-    //   mainAxisAlignment: MainAxisAlignment.center,
-    //   children: const [icon1, icon2, icon3],
-    // );
-
-    /*
-;    * containter widget
-    */
-    var myDecoration = BoxDecoration(
-        color: Colors.green,
-        border: Border.all(color: Colors.blueAccent, width: 10),
-        borderRadius: BorderRadius.circular(12));
-
-    var myContainter = Container(
-      decoration: myDecoration,
-      transform: Matrix4.rotationZ(0.10),
-      // padding: const EdgeInsets.all(150),
-      // margin: const EdgeInsets.all(150),
-      child: icon1,
-    );
     return Scaffold(
       appBar: AppBar(
-        title: Text('Discovers'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('Todo List'),
       ),
-      body: myContainter,
+      body: _buildTodoList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _pushTodoScreen,
+        tooltip: 'Add Task',
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
